@@ -6,27 +6,33 @@ import xlwings as xw
 def copy_sheets(app, ibook, ofile):
     all_sheets = ibook.sheet_names
     print('All existing sheets: {}'.format(all_sheets))
-    out_sheets = input("Please input the sheet names (split by spaces) to extract, or input 'q' to exit:\n")
+    out_sheets = input("Please input the sheet names (split by english ,) to extract, or input 'q' to exit:\n")
     if out_sheets.rstrip() == 'q':
         return
-    out_sheets = out_sheets.rstrip().split()
+    out_sheets = out_sheets.rstrip().split(',')
+    print('Creating output file...')
     obook = app.books.add()
     out_idx = 0
+    print('Copying sheets to output file...')
     for sheet_name in out_sheets:
         if sheet_name not in all_sheets:
             print('Invalid sheet name: {}. Continue to copy next sheet.'.format(sheet_name))
             continue
+        print('Copying sheet: {}'.format(sheet_name))
         ibook.sheets[sheet_name].copy(after=obook.sheets[out_idx])
         out_idx += 1
+    if out_idx > 0:
+        obook.sheets[0].delete()
     obook.save(ofile)
     obook.close()
     print('Copy {} sheets done!'.format(out_idx))
 
 
 def process_excel(ifile, ofile):
-    app=xw.App(visible=False, add_book=False)
+    app=xw.App(visible=True, add_book=False)
     app.display_alerts=False
     app.screen_updating=False
+    print('Opening input file...')
     ibook = app.books.open(ifile)
     copy_sheets(app, ibook, ofile)
     ibook.close()
