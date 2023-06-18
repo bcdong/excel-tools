@@ -4,7 +4,7 @@ import argparse
 import xlwings as xw
 from datetime import datetime
 
-_SUPPORT_TIME_FMT = ['%Y-%m-%d', '%m/%d/%Y']
+_SUPPORT_TIME_FMT = ['%Y-%m-%d']
 
 def parse_datetime(date_str):
     print('Parse time: {}'.format(date_str))
@@ -16,20 +16,31 @@ def parse_datetime(date_str):
     raise ValueError('date_str=[{}] does not match any fmt'.format(date_str))
 
 
-def format_col_time(sheet, col_id):
-    need_update = False
-    col_vals = sheet[1, col_id].expand('down').value
+def format_col_time(sheet, col_id, col_name):
+    nrows = sheet.used_range.last_cell.row
+    print('reading values...')
+    col_vals = sheet[1:nrows, col_id].value
+    # print('col_vals: {}'.format(col_vals))
+    print('iterate values')
     for i in range(len(col_vals)):
-        print('fmt datetime: {}, type={}'.format(col_vals[i], type(col_vals[i])))
-        if type(col_vals[i]) is str:
-            col_vals[i] = parse_datetime(col_vals[i])
-            need_update = True
+        if col_vals[i] is None:
+            # ignore empty value
+            pass
         elif type(col_vals[i]) is datetime:
             pass
+        elif type(col_vals[i]) is str:
+            col_vals[i] = parse_datetime(col_vals[i])
         else:
             raise ValueError('Unsupported type of datetime: {}'.format(type(col_vals[i])))
-    if need_update:
-        sheet[1, col_id].options(transpose=True).value = col_vals
+    col_letter = xw.utils.col_name(col_id + 1)
+    # print('insert column {}'.format(col_name))
+    # sheet.range('{0}:{0}'.format(col_letter)).api.Insert()  # insert new col left to original col
+    print('Set number format...')
+    sheet.range('{0}:{0}'.format(col_letter)).number_format = 'yyyy-mm-dd'
+    print('set col value...')
+    sheet[0, col_id].value = '{}-排序'.format(col_name)
+    sheet[1, col_id].options(transpose=True).value = col_vals
+    print('Done set col value...')
 
 
 def sort_sheet(sht, col_id):
@@ -39,7 +50,9 @@ def sort_sheet(sht, col_id):
     # Key1=sht[0, col_id].api means sort according to col_id
     # Order1=1 means ascending, 2 means descending
     # Orientation=1 means sort in columns but not rows
+    print('sorting...')
     sht[1:nrows, 0:ncols].api.Sort(Key1=sht[0, col_id].api, Order1=1, Orientation=1)
+    print('sort done')
 
 def format_and_sort_sheet(sheet, col_name):
     print('===== Sorting in sheet: [{}] ====='.format(sheet.name))
@@ -55,7 +68,7 @@ def format_and_sort_sheet(sheet, col_name):
     if col_id < 0:
         print('column [{}] not exist in sheet [{}], skip it'.format(col_name, sheet.name))
         return
-    format_col_time(sheet, col_id)
+    format_col_time(sheet, col_id, col_name)
     sort_sheet(sheet, col_id)
 
 
