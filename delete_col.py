@@ -22,6 +22,7 @@ def del_cols_in_one_sheet(sheet, col_names):
         else:
             col_letter = xw.utils.col_name(col_id + 1)  # xw.utils.col_name needs col_id starts from 1 but not 0
             sheet.range('{0}:{0}'.format(col_letter)).api.Delete()
+            head_vals = sheet[0, 0:ncols].value
             num_del += 1
     ncols = sheet[0, 0].expand("right").last_cell.column
     head_vals = sheet[0, 0:ncols].value
@@ -41,7 +42,7 @@ def process_excel(ifile):
     ibook = app.books.open(ifile)
 
     while True:
-        col_names = input("Please input the col_names to delete (split by english ,), or input 'q' to exit:\n")
+        col_names = input("Please input the col_names to delete (split by english ,), or input 'q' to save and exit:\n")
         if col_names.rstrip() == 'q':
             break
         col_names = col_names.rstrip().split(',')

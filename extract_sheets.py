@@ -16,6 +16,7 @@ def copy_sheets(app, ibook, ofile, with_format):
     out_idx = 0
     print('Copying sheets to output file...')
     for sheet_name in out_sheets:
+        sheet_name = sheet_name.strip().rstrip()
         if sheet_name not in all_sheets:
             print('Invalid sheet name: {}. Continue to copy next sheet.'.format(sheet_name))
             continue

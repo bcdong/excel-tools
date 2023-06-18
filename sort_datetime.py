@@ -19,6 +19,7 @@ def parse_datetime(date_str):
 def format_col_time(sheet, col_id, col_name):
     nrows = sheet.used_range.last_cell.row
     col_vals = sheet[1:nrows, col_id].value
+    num_str = 0
     for i in range(len(col_vals)):
         if col_vals[i] is None:
             # ignore empty value
@@ -26,17 +27,22 @@ def format_col_time(sheet, col_id, col_name):
         elif type(col_vals[i]) is datetime:
             pass
         elif type(col_vals[i]) is str:
+            old_val = col_vals[i]
             col_vals[i] = parse_datetime(col_vals[i])
+            if type(col_vals[i]) is datetime:
+                print('format datetime from str, row={}, val={}'.format(i + 2, old_val))
+                num_str += 1
         else:
             raise ValueError('Unsupported type of datetime: {}'.format(type(col_vals[i])))
     col_letter = xw.utils.col_name(col_id + 1)
     # print('insert column {}'.format(col_name))
     # sheet.range('{0}:{0}'.format(col_letter)).api.Insert()  # insert new col left to original col
-    print('Setting col number format...')
+    print('Total number of formated datetime: {}'.format(num_str))
+    print('Setting col number format to yyyy-mm-dd ...')
     sheet.range('{0}:{0}'.format(col_letter)).number_format = 'yyyy-mm-dd'
-    print('Setting col values...')
+    # print('Setting col values...')
     sheet[1, col_id].options(transpose=True).value = col_vals
-    print('Done set col values...')
+    # print('Done set col values...')
 
 
 def sort_sheet(sht, col_id):
@@ -49,7 +55,6 @@ def sort_sheet(sht, col_id):
     sht[1:nrows, 0:ncols].api.Sort(Key1=sht[0, col_id].api, Order1=1, Orientation=1)
 
 def format_and_sort_sheet(sheet, col_name, fmt_date):
-    print('===== Sorting sheet: [{}], start at {}'.format(sheet.name, datetime.now().strftime('%H:%M:%S')))
     ncols = sheet.used_range.last_cell.column
     head_vals = sheet[0, 0:ncols].value
     if not head_vals:
@@ -60,8 +65,9 @@ def format_and_sort_sheet(sheet, col_name, fmt_date):
     except ValueError:
         col_id = -1
     if col_id < 0:
-        print('column [{}] not exist in sheet [{}], skip it'.format(col_name, sheet.name))
+        # print('column [{}] not exist in sheet [{}], skip it'.format(col_name, sheet.name))
         return
+    print('===== Sorting sheet: [{}], start at {}'.format(sheet.name, datetime.now().strftime('%H:%M:%S')))
     if fmt_date:
         format_col_time(sheet, col_id, col_name)
     sort_sheet(sheet, col_id)
