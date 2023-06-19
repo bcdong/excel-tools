@@ -12,16 +12,11 @@ def fmt_date_cols(sht):
     head_vals = sht[0, 0:ncols].value
     if not head_vals:
         return
-    for col_name in _DATE_COL_NAMES:
-        col_id = -1
-        try:
-            col_id = head_vals.index(col_name)
-        except ValueError:
-            col_id = -1
-        if col_id < 0:
+    for col_id, col_name in enumerate(head_vals):
+        if col_name not in _DATE_COL_NAMES:
             continue
         col_letter = xw.utils.col_name(col_id + 1)
-        print('Setting col [{}] format to yyyy-mm-dd ...'.format(col_name))
+        print('Setting col=[{}] with name=[{}] format to yyyy-mm-dd ...'.format(col_letter, col_name))
         sht.range('{0}:{0}'.format(col_letter)).number_format = 'yyyy-mm-dd'
 
 
