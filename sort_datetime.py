@@ -88,9 +88,9 @@ def process_excel(ifile, fmt_date):
 
     while True:
         col_name = input("Please input the col_name to sort, or input 'q' to save and exit:\n")
-        if col_name.rstrip() == 'q':
+        if col_name.strip() == 'q':
             break
-        col_name = col_name.rstrip()
+        col_name = col_name.strip()
         sort_book(ibook, col_name, fmt_date)
 
     print('Saving file...')
