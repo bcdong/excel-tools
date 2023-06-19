@@ -52,6 +52,7 @@ def process_excel(ifile):
     ibook.save()
     ibook.close()
     app.quit()
+    print('Done!')
 
 
 if __name__ == '__main__':

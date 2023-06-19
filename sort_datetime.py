@@ -97,6 +97,7 @@ def process_excel(ifile, fmt_date):
     ibook.save()
     ibook.close()
     app.quit()
+    print('Done!')
 
 
 if __name__ == '__main__':
