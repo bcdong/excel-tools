@@ -4,7 +4,7 @@ import argparse
 import xlwings as xw
 from datetime import datetime
 
-_DATE_COL_NAMES = ['创建时间', '修改时间']
+_DATE_COL_NAMES = ['创建时间', '修改时间', '创建日期', '修改日期']
 
 
 def fmt_date_cols(sht):
@@ -43,8 +43,8 @@ def copy_sheets(app, ibook, ofile, with_format, should_fmt_date):
             obook.sheets.add(name=sheet_name, after=obook.sheets[out_idx])
             output_data = ibook.sheets[sheet_name][0, 0].expand('table').value
             obook.sheets[sheet_name][0, 0].expand('table').value = output_data
-            if should_fmt_date:
-                fmt_date_cols(obook.sheets[sheet_name])
+        if should_fmt_date:
+            fmt_date_cols(obook.sheets[sheet_name])
         out_idx += 1
         print('===== Done copy sheet: {}, end at {}'.format(sheet_name, datetime.now().strftime('%H:%M:%S')))
 
