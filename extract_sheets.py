@@ -56,6 +56,9 @@ def copy_sheets(app, ibook, ofile, with_format, should_fmt_date):
 
 
 def process_excel(ifile, ofile, with_format, fmt_date):
+    if not ofile.endswith('.xlsx'):
+        print('Error: output file name must ends with .xlsx!')
+        return
     app=xw.App(visible=True, add_book=False)
     app.display_alerts=False
     app.screen_updating=False
